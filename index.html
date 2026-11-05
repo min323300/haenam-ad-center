@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>해남공구마켓 광고 운영 센터</title>
+<style>
+*{box-sizing:border-box}
+:root{--green:#176c46;--green2:#24915f;--bg:#f5f6f3;--line:#e2e6e2;--ink:#1e2a23;--muted:#6c756f;--red:#c0392b;--amber:#b7791f}
+body{margin:0;font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.head-in{max-width:1280px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.logo{font-weight:900;color:var(--green);font-size:19px}.logo small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:none;border:0;padding:9px 13px;border-radius:9px;font-weight:700;color:#4b554f;cursor:pointer;font-size:14px}
+nav button.on{background:#e8f3ec;color:var(--green)}
+.spacer{flex:1}
+main{max-width:1280px;margin:20px auto;padding:0 20px 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+h2{margin:0 0 6px;font-size:20px}.muted{color:var(--muted);font-size:13px;line-height:1.6}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:5px;min-width:140px}
+.field label{font-size:12px;font-weight:700;color:#4b554f}
+input,select,textarea{border:1px solid #ccd3cc;border-radius:9px;padding:10px;font-size:14px;background:#fff;font-family:inherit}
+textarea{min-height:90px;resize:vertical;width:100%}
+button.btn{border:0;border-radius:9px;padding:10px 15px;font-weight:800;cursor:pointer;font-size:14px}
+.primary{background:var(--green);color:#fff}.secondary{background:#ecefec;color:#222}.danger{background:#fdeaea;color:var(--red)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.notice{display:none;padding:11px 13px;border-radius:10px;margin:12px 0;background:#eef8f2;color:#17623f;font-size:14px}
+.notice.err{background:#fdeaea;color:#a32121}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.tile{background:#f7f9f7;border:1px solid var(--line);border-radius:12px;padding:14px}
+.tile span{font-size:12px;color:var(--muted)}.tile b{display:block;font-size:22px;margin-top:4px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:right;white-space:nowrap}
+th{background:#f2f6f3;font-size:12px;color:#4b554f;position:sticky;top:0}
+td.l,th.l{text-align:left}td.wrap{white-space:normal;min-width:180px}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800}
+.v-키우기{background:#e3f4e8;color:#17623f}.v-관찰{background:#fff4dc;color:#8a5a00}.v-끄기{background:#fdeaea;color:var(--red)}.v-대기{background:#eef0ee;color:#666}
+.copy-item{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+.copy-item input[type=text]{flex:1}
+.cnt{font-size:12px;color:var(--muted);min-width:44px;text-align:right}.cnt.over{color:var(--red);font-weight:800}
+.mini{padding:5px 9px;font-size:12px;border-radius:7px}
+.hidden{display:none!important}
+#login{max-width:380px;margin:12vh auto}
+code{background:#f1f3f1;padding:2px 5px;border-radius:5px;font-size:12px}
+.link{font-size:12px;color:#555;max-width:340px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:middle}
+@media(max-width:700px){.field{min-width:46%}}
+</style>
+</head>
+<body>
+
+<div id="login" class="card">
+  <h2>광고 운영 센터</h2>
+  <p class="muted">해남공구마켓 광고 성과를 관리합니다. 관리자 비밀번호를 입력하세요.</p>
+  <input id="pw" type="password" placeholder="관리자 비밀번호" style="width:100%;margin-top:8px" autocomplete="current-password">
+  <button class="btn primary" style="width:100%;margin-top:10px" onclick="login()">로그인</button>
+  <div id="loginMsg" class="notice"></div>
+</div>
+
+<div id="app" class="hidden">
+<header><div class="head-in">
+  <div class="logo">광고 운영 센터<small>해남공구마켓 · 당근 · DB센스</small></div>
+  <nav>
+    <button data-tab="dash" class="on">대시보드</button>
+    <button data-tab="make">소재 만들기</button>
+    <button data-tab="list">소재 목록</button>
+    <button data-tab="cost">광고비 입력</button>
+    <button data-tab="db">DB센스 실적</button>
+    <button data-tab="set">설정</button>
+  </nav>
+  <div class="spacer"></div>
+  <button class="btn secondary mini" onclick="logout()">로그아웃</button>
+</div></header>
+
+<main>
+<div id="msg" class="notice"></div>
+
+<!-- ============ 대시보드 ============ -->
+<section id="tab-dash">
+  <div class="card">
+    <h2>소재별 성과</h2>
+    <p class="muted">수익 = 입금 확인된 주문의 상품 마진 + DB센스 수익. 수익률 150% 이상이면 <b>키우기</b>, 100% 미만이면 <b>끄기</b>. 클릭 200 미만은 판단을 보류합니다.</p>
+    <div class="row" style="margin-top:10px">
+      <div class="field"><label>시작일</label><input type="date" id="dFrom"></div>
+      <div class="field"><label>종료일</label><input type="date" id="dTo"></div>
+      <div class="field"><label>보기</label><select id="dStatus"><option value="진행">진행 중 소재만</option><option value="">전체</option></select></div>
+      <button class="btn primary" onclick="loadDashboard()">불러오기</button>
+    </div>
+    <div class="tiles" id="dTiles"></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th class="l">판정</th><th class="l">소재</th><th class="l">문구</th><th>광고비</th><th>클릭</th><th>클릭당</th><th>방문자</th><th>주문</th><th>입금</th><th>입금매출</th><th>마진</th><th>DB수익</th><th>순이익</th><th>수익률</th><th class="l">이유</th></tr></thead>
+      <tbody id="dRows"><tr><td colspan="15" class="l muted">불러오기를 눌러 주세요.</td></tr></tbody>
+    </table></div>
+    <p class="muted" id="dNote"></p>
+  </div>
+</section>
+
+<!-- ============ 소재 만들기 ============ -->
+<section id="tab-make" class="hidden">
+  <div class="card">
+    <h2>소재 만들기</h2>
+    <p class="muted">상품을 고르면 30자 이내 광고 문구 후보와 소재별 추적 링크, 이미지 프롬프트를 만듭니다. 문구는 직접 고칠 수 있고, 체크한 것만 저장됩니다.</p>
+    <div class="row" style="margin-top:10px">
+      <div class="field"><label>구분</label><select id="mKind" onchange="onKindChange()"><option value="해남">해남공구마켓 상품</option><option value="DB센스">DB센스 광고주</option></select></div>
+      <div class="field"><label>채널</label><select id="mChannel" onchange="previewCodes()">
+        <option value="당근광고" data-p="D">당근 광고 (D)</option>
+        <option value="당근소식" data-p="N">당근 소식 (N)</option>
+        <option value="카페" data-p="C">네이버 카페 (C)</option>
+        <option value="블로그" data-p="B">블로그 (B)</option>
+        <option value="인스타" data-p="I">인스타·스레드 (I)</option>
+        <option value="QR" data-p="P">포스터 QR (P)</option>
+      </select></div>
+    </div>
+
+    <div id="mHaenam" class="row" style="margin-top:10px">
+      <div class="field" style="min-width:240px"><label>상품</label><select id="mProduct" onchange="fillProduct()"></select></div>
+      <div class="field"><label>판매가(원)</label><input id="mPrice" type="number"></div>
+      <div class="field"><label>정상가(원)</label><input id="mNormal" type="number"></div>
+      <div class="field"><label>규격</label><input id="mSpec" placeholder="예: 20kg"></div>
+      <div class="field"><label>배송</label><select id="mShip"><option>택배비 포함</option><option>무료배송</option><option value="">표시 안 함</option></select></div>
+      <div class="field"><label>마감일</label><input id="mEnd" type="date"></div>
+      <div class="field" style="flex:1;min-width:220px"><label>특징 (쉼표로 구분, 사실만)</label><input id="mFeat" placeholder="예: 희망 도착일 선택, 산지직송"></div>
+    </div>
+
+    <div id="mDb" class="row hidden" style="margin-top:10px">
+      <div class="field" style="min-width:200px"><label>광고주·상품 (예: 인터넷 가입)</label><input id="mDbName"></div>
+      <div class="field" style="min-width:220px"><label>광고주가 제시한 혜택 (그대로)</label><input id="mDbBenefit" placeholder="예: 현금 48만원 지원"></div>
+      <div class="field" style="flex:1;min-width:260px"><label>DB센스에서 발급받은 홍보 URL</label><input id="mDbUrl" placeholder="https://..."></div>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" onclick="generate()">문구 만들기</button>
+      <span class="muted" id="mCodeHint"></span>
+    </div>
+
+    <div id="mOut" class="hidden" style="margin-top:14px">
+      <div id="mCopies"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn secondary mini" onclick="addCopyRow('')">+ 문구 직접 추가</button>
+      </div>
+      <h3 style="font-size:15px;margin:16px 0 6px">이미지 프롬프트 (GPT 등에 그대로 붙여넣기)</h3>
+      <textarea id="mPrompt"></textarea>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" onclick="saveMade()">체크한 소재 저장</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 소재 목록 ============ -->
+<section id="tab-list" class="hidden">
+  <div class="card">
+    <h2>소재 목록</h2>
+    <p class="muted">광고를 등록할 때 문구와 링크를 복사해서 쓰세요. 끝난 소재는 '중지'나 '종료'로 바꾸면 광고비 입력 목록에서 빠집니다.</p>
+    <div class="row" style="margin-top:10px">
+      <div class="field"><label>상태</label><select id="lStatus" onchange="renderList()"><option value="진행">진행</option><option value="">전체</option><option value="중지">중지</option><option value="종료">종료</option></select></div>
+      <div class="field"><label>채널</label><select id="lChannel" onchange="renderList()"><option value="">전체</option><option>당근광고</option><option>당근소식</option><option>카페</option><option>블로그</option><option>인스타</option><option>QR</option></select></div>
+    </div>
+    <div class="table-wrap" style="margin-top:10px"><table>
+      <thead><tr><th class="l">코드</th><th class="l">채널</th><th class="l">상품</th><th class="l">문구</th><th class="l">링크</th><th class="l">상태</th><th class="l">생성일</th></tr></thead>
+      <tbody id="lRows"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ 광고비 입력 ============ -->
+<section id="tab-cost" class="hidden">
+  <div class="card">
+    <h2>광고비 입력</h2>
+    <p class="muted">당근 광고 관리자 화면의 소재별 <b>광고비·노출·클릭</b>을 날짜별로 옮겨 적습니다. 같은 날짜를 다시 저장하면 덮어씁니다.</p>
+    <div class="row" style="margin-top:10px">
+      <div class="field"><label>날짜</label><input type="date" id="cDate" onchange="loadCosts()"></div>
+      <button class="btn secondary" onclick="loadCosts()">불러오기</button>
+    </div>
+    <details style="margin-top:12px"><summary class="muted" style="cursor:pointer">한 번에 붙여넣기 (엑셀에서 복사: 소재코드 · 광고비 · 노출 · 클릭)</summary>
+      <textarea id="cPaste" placeholder="D01	20000	9000	210&#10;D02	15000	7000	150"></textarea>
+      <button class="btn secondary mini" onclick="applyPaste()">표에 채우기</button>
+    </details>
+    <div class="table-wrap" style="margin-top:10px"><table>
+      <thead><tr><th class="l">코드</th><th class="l">문구</th><th>광고비(원)</th><th>노출</th><th>클릭</th></tr></thead>
+      <tbody id="cRows"></tbody>
+    </table></div>
+    <button class="btn primary" style="margin-top:12px" onclick="saveCosts()">저장</button>
+  </div>
+</section>
+
+<!-- ============ DB센스 ============ -->
+<section id="tab-db" class="hidden">
+  <div class="card">
+    <h2>DB센스 실적</h2>
+    <p class="muted">DB센스 관리자 화면의 날짜별 신청·인정 건수를 옮겨 적습니다. 수익을 비워 두면 인정 × 건당단가로 계산합니다.</p>
+    <div class="row" style="margin-top:10px">
+      <div class="field"><label>날짜</label><input type="date" id="bDate"></div>
+      <div class="field"><label>소재코드</label><select id="bCode"></select></div>
+      <div class="field"><label>캠페인명</label><input id="bCampaign"></div>
+      <div class="field"><label>신청</label><input id="bApplied" type="number" min="0"></div>
+      <div class="field"><label>인정</label><input id="bApproved" type="number" min="0"></div>
+      <div class="field"><label>건당단가</label><input id="bUnit" type="number" min="0"></div>
+      <div class="field"><label>수익(선택)</label><input id="bRevenue" type="number" min="0"></div>
+      <button class="btn primary" onclick="saveDb()">추가</button>
+    </div>
+    <div class="table-wrap" style="margin-top:12px"><table>
+      <thead><tr><th class="l">날짜</th><th class="l">코드</th><th class="l">캠페인</th><th>신청</th><th>인정</th><th>단가</th><th>수익</th><th></th></tr></thead>
+      <tbody id="bRows"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ 설정 ============ -->
+<section id="tab-set" class="hidden">
+  <div class="card">
+    <h2>상품별 개당 마진</h2>
+    <p class="muted">판매가에서 매입가·택배비·포장비를 뺀 <b>1개당 남는 금액</b>입니다. 수익률 계산에 쓰입니다.</p>
+    <div class="table-wrap" style="margin-top:10px"><table>
+      <thead><tr><th class="l">상품</th><th>판매가</th><th>개당 마진(원)</th><th>마진율</th></tr></thead>
+      <tbody id="sRows"></tbody>
+    </table></div>
+    <button class="btn primary" style="margin-top:12px" onclick="saveMargins()">마진 저장</button>
+  </div>
+  <div class="card">
+    <h2>링크 기본 주소</h2>
+    <p class="muted">도메인을 연결하면 여기를 새 주소로 바꾸세요. 이미 저장된 소재 링크는 바뀌지 않습니다.</p>
+    <div class="row"><input id="sSite" style="flex:1;min-width:280px"><button class="btn secondary" onclick="saveSite()">저장</button></div>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+// ★ 광고센터 Apps Script 웹 앱 주소를 넣으세요.
+const API_URL = 'https://script.google.com/macros/s/AKfycbxE4Sp7nkdyAyfZmXEK4GUHc-UvPM2AfYSE06KUD43lld0YUqUljhL_pr_5_ZUW-YL6/exec';
+const DEFAULT_SITE = 'https://min323300.github.io/haenam-groupbuy/';
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const won = n => Math.round(Number(n||0)).toLocaleString('ko-KR') + '원';
+const num = n => Math.round(Number(n||0)).toLocaleString('ko-KR');
+const pct = n => n == null ? '-' : Math.round(n*100) + '%';
+let PW = '';
+let DATA = { products: [], creatives: [], margins: {}, dbsense: [] };
+
+function store(k, v){ try{ v==null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); }catch(_){} }
+function load(k){ try{ return sessionStorage.getItem(k); }catch(_){ return null; } }
+function siteUrl(){ try{ return localStorage.getItem('adSite') || DEFAULT_SITE; }catch(_){ return DEFAULT_SITE; } }
+
+function note(text, err){ const el=$('msg'); el.textContent=text; el.className='notice'+(err?' err':''); el.style.display=text?'block':'none'; if(text&&!err) setTimeout(()=>{ if(el.textContent===text) el.style.display='none'; }, 5000); }
+
+async function api(action, body){
+  if(API_URL.includes('여기에_')) throw new Error('index.html 의 API_URL 에 광고센터 웹 앱 주소를 넣어 주세요.');
+  const r = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({...body, action, password: PW})});
+  const d = await r.json();
+  if(!d.success) throw new Error(d.message || '요청 실패');
+  return d;
+}
+
+/* ---------- 로그인 ---------- */
+async function login(){
+  const m=$('loginMsg');
+  try{
+    PW = $('pw').value;
+    await api('login', {});
+    store('adPw', PW);
+    $('login').classList.add('hidden'); $('app').classList.remove('hidden');
+    await refresh();
+    loadDashboard();
+  }catch(e){ m.textContent=e.message; m.className='notice err'; m.style.display='block'; }
+}
+function logout(){ store('adPw', null); PW=''; location.reload(); }
+$('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
+
+async function refresh(){
+  const d = await api('bootstrap', {});
+  DATA = { products: d.products||[], creatives: d.creatives||[], margins: d.margins||{}, dbsense: d.dbsense||[] };
+  fillProductSelect(); renderList(); renderMargins(); renderDb(); previewCodes();
+}
+
+/* ---------- 탭 ---------- */
+document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x===b));
+  document.querySelectorAll('main > section').forEach(s => s.classList.toggle('hidden', s.id !== 'tab-'+b.dataset.tab));
+  if(b.dataset.tab==='cost') loadCosts();
+}));
+
+/* ---------- 날짜 기본값 ---------- */
+function ymd(d){ const z=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
+(function(){ const now=new Date(); $('dFrom').value=ymd(new Date(now.getFullYear(),now.getMonth(),1)); $('dTo').value=ymd(now);
+  const y=new Date(now.getTime()-86400000); $('cDate').value=ymd(y); $('bDate').value=ymd(y); $('sSite').value=siteUrl(); })();
+
+/* ---------- 대시보드 ---------- */
+async function loadDashboard(){
+  try{
+    $('dRows').innerHTML='<tr><td colspan="15" class="l muted">불러오는 중...</td></tr>';
+    const d = await api('dashboard', {from:$('dFrom').value, to:$('dTo').value});
+    const st=$('dStatus').value;
+    const rows=d.rows.filter(r=>!st||r.status===st);
+    const t=d.total;
+    $('dTiles').innerHTML=[
+      ['광고비', won(t.cost)], ['클릭', num(t.clicks)], ['주문(입금)', num(t.orders)+'건 ('+num(t.paidOrders)+')'],
+      ['입금 매출', won(t.paidSales)], ['수익(마진+DB)', won(t.profit)], ['순이익', won(t.net)], ['수익률', pct(t.roas)]
+    ].map(([k,v])=>`<div class="tile"><span>${k}</span><b style="${k==='순이익'&&t.net<0?'color:#c0392b':''}">${v}</b></div>`).join('');
+    $('dRows').innerHTML = rows.length ? rows.map(r=>`<tr>
+      <td class="l"><span class="badge v-${esc(r.verdict)}">${esc(r.verdict)}</span></td>
+      <td class="l"><b>${esc(r.code)}</b><br><span class="muted">${esc(r.channel)} · ${esc(r.productName)}</span></td>
+      <td class="l wrap">${esc(r.copy)}</td>
+      <td>${num(r.cost)}</td><td>${num(r.clicks)}</td><td>${r.cpc==null?'-':num(r.cpc)}</td><td>${num(r.visitors)}</td>
+      <td>${num(r.orders)}</td><td>${num(r.paidOrders)}</td><td>${num(r.paidSales)}</td><td>${num(r.margin)}</td><td>${num(r.dbRevenue)}</td>
+      <td style="${r.net<0?'color:#c0392b':''}">${num(r.net)}</td><td>${pct(r.roas)}</td>
+      <td class="l wrap muted">${esc(r.reason)}</td></tr>`).join('')
+      : '<tr><td colspan="15" class="l muted">해당 기간에 소재가 없습니다. "소재 만들기"에서 먼저 소재를 만들어 주세요.</td></tr>';
+    $('dNote').textContent = `소재코드가 없는 주문 ${d.untaggedOrders}건(직접 방문·파트너 링크 등)은 위 표에 포함되지 않습니다. 방문자 수는 해남공구마켓 방문통계 기준입니다.`;
+  }catch(e){ note('대시보드 오류: '+e.message, true); }
+}
+
+/* ---------- 소재 만들기 ---------- */
+function onKindChange(){
+  const db=$('mKind').value==='DB센스';
+  $('mHaenam').classList.toggle('hidden', db); $('mDb').classList.toggle('hidden', !db);
+  previewCodes();
+}
+function fillProductSelect(){
+  const today=ymd(new Date());
+  const list=DATA.products.filter(p=>p.status!=='종료' && (!p.endDate || p.endDate>=today));
+  $('mProduct').innerHTML = list.map(p=>`<option value="${esc(p.productCode)}">${esc(p.productName)} (${num(p.salePrice)}원)</option>`).join('') || '<option value="">판매 중인 상품 없음</option>';
+  fillProduct();
+}
+function fillProduct(){
+  const p=DATA.products.find(x=>x.productCode===$('mProduct').value); if(!p) return;
+  $('mPrice').value=p.salePrice||''; $('mNormal').value=p.normalPrice||''; $('mEnd').value=p.endDate||'';
+  const m=String(p.productName).match(/(\d+(?:\.\d+)?\s?(?:kg|g|개|과|박스|입))/i); $('mSpec').value=m?m[1]:'';
+}
+function channelPrefix(){ const o=$('mChannel').selectedOptions[0]; return ($('mKind').value==='DB센스'?'X':'') + o.dataset.p; }
+function nextCodes(n){
+  const pre=channelPrefix();
+  const used=new Set(DATA.creatives.map(c=>c.code));
+  document.querySelectorAll('#mCopies .copy-code').forEach(el=>used.add(el.textContent));
+  const out=[]; let i=1;
+  while(out.length<n){ const c=pre+String(i).padStart(2,'0'); if(!used.has(c)) out.push(c); i++; }
+  return out;
+}
+function previewCodes(){ $('mCodeHint').textContent='다음 소재코드: '+nextCodes(1)[0]+' 부터'; }
+function shortName(n){ return String(n).replace(/\s*\d+(\.\d+)?\s?(kg|g|개|과|박스|입)\s*/ig,' ').replace(/\s+/g,' ').trim(); }
+function prettyName(n){ return shortName(n).replace(/^해남(?=\S)/,'해남 '); }
+
+function buildHaenamCopies(){
+  const p=DATA.products.find(x=>x.productCode===$('mProduct').value)||{productName:''};
+  const N=prettyName(p.productName), S=$('mSpec').value.trim(), P=num($('mPrice').value), NP=num($('mNormal').value);
+  const T=$('mShip').value, end=$('mEnd').value, feats=$('mFeat').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const md=end?Number(end.slice(5,7))+'/'+Number(end.slice(8,10)):'';
+  const disc=Number($('mNormal').value)>Number($('mPrice').value)&&Number($('mPrice').value)>0?Math.round((1-Number($('mPrice').value)/Number($('mNormal').value))*100):0;
+  const NS=(N+(S?' '+S:'')).trim();
+  const c=[
+    `${NS} ${P}원${T?' '+T:''}`,
+    `${NS} 공동구매 ${P}원`,
+    md?`${md} 마감! ${N} 공동구매`:'',
+    disc?`정상가 ${NP}원 → ${P}원 ${N}`:'',
+    disc?`${disc}% 할인 ${NS} 공동구매`:'',
+    `${N} 산지에서 바로 보내드려요`,
+    `${NS}${T?' '+T:''} 공구 특가`,
+    `${N} 공동구매 진행 중`,
+    `이번 주 ${N} 공구 열렸어요`,
+    `해남 땅끝에서 온 ${N.replace(/^해남\s*/,'')}`,
+    ...feats.map(f=>`${f} ${N}`),
+    ...feats.map(f=>`${N} · ${f}`)
+  ];
+  return c;
+}
+function buildDbCopies(){
+  const A=$('mDbName').value.trim(), B=$('mDbBenefit').value.trim();
+  if(!A) throw new Error('광고주·상품을 입력해 주세요.');
+  return [
+    B?`${A} 바꾸면 ${B}`:'',
+    B?`${B} 받고 ${A} 바꿨어요`:'',
+    B?`${A} 교체하고 ${B} 받기`:'',
+    B?`${A} 상담 신청하면 ${B}`:'',
+    `${A} 비교하고 혜택 확인하기`,
+    `우리 집 ${A} 혜택 조회`,
+    `${A} 아직 그대로 쓰세요?`,
+    `${A} 가입 혜택 한 번에 비교`,
+    `${A} 바꿀 때 꼭 확인하세요`,
+    `동네 이웃들이 확인한 ${A} 혜택`
+  ];
+}
+function generate(){
+  try{
+    const db=$('mKind').value==='DB센스';
+    if(db && !/^https?:\/\//.test($('mDbUrl').value.trim())) throw new Error('DB센스 홍보 URL을 입력해 주세요.');
+    if(!db && !$('mProduct').value) throw new Error('상품을 선택해 주세요.');
+    const raw=db?buildDbCopies():buildHaenamCopies();
+    const seen=new Set(); const list=[];
+    raw.map(s=>String(s||'').replace(/\s+/g,' ').trim()).forEach(s=>{ if(s && s.length<=30 && !seen.has(s)){ seen.add(s); list.push(s); } });
+    $('mCopies').innerHTML='';
+    list.slice(0,10).forEach(s=>addCopyRow(s));
+    $('mPrompt').value = db
+      ? `정사각형 실사 사진으로 그려줘. 집 안 방구석에서 스마트폰으로 직접 찍은 듯한 ${$('mDbName').value.trim()} 관련 장면. 자연광, 과한 보정 없이 중고거래 사진처럼 수수하게. 사진 안에 글자·로고 넣지 않기.`
+      : `정사각형 실사 사진으로 그려줘. ${prettyName((DATA.products.find(x=>x.productCode===$('mProduct').value)||{}).productName||'')}${$('mSpec').value?' '+$('mSpec').value:''}이(가) 해남 시골 창고나 집 마당 평상 위에 놓인 모습. 스마트폰으로 직접 찍은 듯 자연광, 과한 보정 없이 수수하게. 사진 안에 글자 넣지 않기.`;
+    $('mOut').classList.remove('hidden');
+  }catch(e){ note(e.message, true); }
+}
+function linkFor(code){
+  if($('mKind').value==='DB센스') return $('mDbUrl').value.trim();
+  const ch=$('mChannel').value;
+  const map={당근광고:['daangn','ad'],당근소식:['daangn','post'],카페:['naver','cafe'],블로그:['blog','post'],인스타:['sns','post'],QR:['qr','poster']};
+  const [src,med]=map[ch]||['etc','etc'];
+  const u=new URL(siteUrl()); u.search='';
+  u.searchParams.set('utm_source',src); u.searchParams.set('utm_medium',med);
+  u.searchParams.set('utm_campaign',code); u.searchParams.set('utm_content',code);
+  return u.toString();
+}
+function addCopyRow(text){
+  const code=nextCodes(1)[0];
+  const div=document.createElement('div'); div.className='copy-item';
+  div.innerHTML=`<input type="checkbox" checked><b class="copy-code" style="min-width:48px">${esc(code)}</b>
+    <input type="text" value="${esc(text)}" maxlength="40"><span class="cnt"></span>
+    <button class="btn secondary mini" type="button">링크 복사</button>`;
+  const inp=div.querySelector('input[type=text]'), cnt=div.querySelector('.cnt');
+  const upd=()=>{ cnt.textContent=inp.value.length+'/30'; cnt.classList.toggle('over', inp.value.length>30); };
+  inp.addEventListener('input', upd); upd();
+  div.querySelector('button').addEventListener('click', ()=>copyText(linkFor(code)));
+  $('mCopies').appendChild(div);
+}
+async function saveMade(){
+  try{
+    const db=$('mKind').value==='DB센스';
+    const p=DATA.products.find(x=>x.productCode===$('mProduct').value)||{};
+    const items=[...document.querySelectorAll('#mCopies .copy-item')].filter(d=>d.querySelector('input[type=checkbox]').checked).map(d=>{
+      const code=d.querySelector('.copy-code').textContent, copy=d.querySelector('input[type=text]').value.trim();
+      if(!copy) throw new Error(code+' 문구가 비어 있습니다.');
+      if(copy.length>30) throw new Error(code+' 문구가 30자를 넘습니다. ('+copy.length+'자)');
+      return { code, channel:$('mChannel').value, kind:db?'DB센스':'해남',
+        productCode: db?'':p.productCode, productName: db?$('mDbName').value.trim():p.productName,
+        copy, imageNote:$('mPrompt').value, link:linkFor(code) };
+    });
+    if(!items.length) throw new Error('저장할 문구를 체크해 주세요.');
+    const r=await api('saveCreatives',{items});
+    await refresh();
+    $('mCopies').innerHTML=''; $('mOut').classList.add('hidden');
+    note(`소재 ${r.saved}개를 저장했습니다. "소재 목록"에서 문구와 링크를 복사해 광고에 등록하세요.`);
+  }catch(e){ note('저장 오류: '+e.message, true); }
+}
+
+/* ---------- 소재 목록 ---------- */
+function renderList(){
+  const st=$('lStatus').value, ch=$('lChannel').value;
+  const rows=DATA.creatives.filter(c=>(!st||c.status===st)&&(!ch||c.channel===ch));
+  $('lRows').innerHTML = rows.length ? rows.map(c=>`<tr>
+    <td class="l"><b>${esc(c.code)}</b></td><td class="l">${esc(c.channel)}</td><td class="l">${esc(c.productName)}</td>
+    <td class="l wrap">${esc(c.copy)} <button class="btn secondary mini" onclick='copyText(${JSON.stringify(c.copy)})'>복사</button></td>
+    <td class="l"><span class="link" title="${esc(c.link)}">${esc(c.link)}</span> <button class="btn secondary mini" onclick='copyText(${JSON.stringify(c.link)})'>복사</button></td>
+    <td class="l"><select onchange="setStatus('${esc(c.code)}',this.value)">${['진행','중지','종료'].map(s=>`<option ${s===c.status?'selected':''}>${s}</option>`).join('')}</select></td>
+    <td class="l">${esc(c.createdAt)}</td></tr>`).join('')
+    : '<tr><td colspan="7" class="l muted">소재가 없습니다.</td></tr>';
+  renderDbCodeSelect();
+}
+async function setStatus(code, status){
+  try{ await api('updateCreative',{code,status}); const c=DATA.creatives.find(x=>x.code===code); if(c) c.status=status; note(code+' → '+status); renderList(); }
+  catch(e){ note('상태 변경 오류: '+e.message, true); }
+}
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); }
+  catch(_){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  note('복사했습니다: '+(t.length>60?t.slice(0,60)+'…':t));
+}
+
+/* ---------- 광고비 ---------- */
+async function loadCosts(){
+  try{
+    const active=DATA.creatives.filter(c=>c.status==='진행' && (c.channel==='당근광고'));
+    const d=await api('getCosts',{date:$('cDate').value});
+    const codes=new Set(active.map(c=>c.code)); Object.keys(d.costs||{}).forEach(k=>codes.add(k));
+    const list=[...codes].sort();
+    $('cRows').innerHTML = list.length ? list.map(code=>{
+      const c=DATA.creatives.find(x=>x.code===code)||{}; const v=(d.costs||{})[code]||{};
+      return `<tr data-code="${esc(code)}"><td class="l"><b>${esc(code)}</b></td><td class="l wrap">${esc(c.copy||'')}</td>
+        <td><input class="c-cost" type="number" min="0" value="${v.cost??''}" style="width:110px"></td>
+        <td><input class="c-imp" type="number" min="0" value="${v.impressions??''}" style="width:100px"></td>
+        <td><input class="c-clk" type="number" min="0" value="${v.clicks??''}" style="width:90px"></td></tr>`;
+    }).join('') : '<tr><td colspan="5" class="l muted">진행 중인 당근 광고 소재가 없습니다.</td></tr>';
+  }catch(e){ note('광고비 불러오기 오류: '+e.message, true); }
+}
+function applyPaste(){
+  let n=0;
+  $('cPaste').value.split(/\r?\n/).forEach(line=>{
+    const s=line.trim(); if(!s) return;
+    // 탭 > 공백 > 쉼표 순으로 구분 (20,000 같은 천단위 쉼표는 숫자로 유지)
+    const p=(s.includes('\t') ? s.split('\t') : /\s/.test(s) ? s.split(/\s+/) : s.split(',')).map(x=>x.trim()).filter(Boolean);
+    if(p.length<2) return;
+    const tr=document.querySelector(`#cRows tr[data-code="${CSS.escape(p[0])}"]`); if(!tr) return;
+    const v=i=>String(p[i]||'').replace(/[^\d]/g,'');
+    tr.querySelector('.c-cost').value=v(1); if(p[2]) tr.querySelector('.c-imp').value=v(2); if(p[3]) tr.querySelector('.c-clk').value=v(3); n++;
+  });
+  note(n+'개 소재에 채웠습니다. 확인 후 저장하세요.', n===0);
+}
+async function saveCosts(){
+  try{
+    const items=[...document.querySelectorAll('#cRows tr[data-code]')].map(tr=>({
+      code:tr.dataset.code, cost:tr.querySelector('.c-cost').value, impressions:tr.querySelector('.c-imp').value, clicks:tr.querySelector('.c-clk').value
+    })).filter(x=>x.cost!==''||x.impressions!==''||x.clicks!=='');
+    if(!items.length) throw new Error('입력한 값이 없습니다.');
+    const r=await api('saveCosts',{date:$('cDate').value, items});
+    note(`${$('cDate').value} 광고비 ${r.saved}건을 저장했습니다.`);
+  }catch(e){ note('광고비 저장 오류: '+e.message, true); }
+}
+
+/* ---------- DB센스 ---------- */
+function renderDbCodeSelect(){
+  const list=DATA.creatives.filter(c=>c.kind==='DB센스');
+  $('bCode').innerHTML = list.map(c=>`<option value="${esc(c.code)}">${esc(c.code)} · ${esc(c.productName)}</option>`).join('') || '<option value="">DB센스 소재 없음</option>';
+}
+function renderDb(){
+  $('bRows').innerHTML = DATA.dbsense.length ? DATA.dbsense.slice().reverse().map(x=>`<tr>
+    <td class="l">${esc(x.date)}</td><td class="l">${esc(x.code)}</td><td class="l">${esc(x.campaign)}</td>
+    <td>${num(x.applied)}</td><td>${num(x.approved)}</td><td>${num(x.unit)}</td><td>${num(x.revenue)}</td>
+    <td><button class="btn danger mini" onclick="delDb(${x.row})">삭제</button></td></tr>`).join('')
+    : '<tr><td colspan="8" class="l muted">입력된 실적이 없습니다.</td></tr>';
+}
+async function saveDb(){
+  try{
+    if(!$('bCode').value) throw new Error('먼저 "소재 만들기"에서 DB센스 소재를 만들어 주세요.');
+    await api('saveDbsense',{item:{date:$('bDate').value, code:$('bCode').value, campaign:$('bCampaign').value,
+      applied:$('bApplied').value, approved:$('bApproved').value, unit:$('bUnit').value, revenue:$('bRevenue').value}});
+    ['bApplied','bApproved','bRevenue'].forEach(id=>$(id).value='');
+    await refresh(); note('DB센스 실적을 추가했습니다.');
+  }catch(e){ note('DB센스 저장 오류: '+e.message, true); }
+}
+async function delDb(row){
+  if(!confirm('이 실적을 삭제할까요?')) return;
+  try{ await api('deleteDbsense',{row}); await refresh(); note('삭제했습니다.'); }catch(e){ note('삭제 오류: '+e.message, true); }
+}
+
+/* ---------- 설정 ---------- */
+function renderMargins(){
+  $('sRows').innerHTML = DATA.products.map(p=>{
+    const m=DATA.margins[p.productCode]??'';
+    return `<tr data-code="${esc(p.productCode)}" data-name="${esc(p.productName)}"><td class="l">${esc(p.productName)}</td><td>${num(p.salePrice)}</td>
+      <td><input class="s-m" type="number" min="0" value="${m}" style="width:120px" oninput="this.closest('tr').querySelector('.s-r').textContent=this.value&&${Number(p.salePrice)||0}?Math.round(this.value/${Number(p.salePrice)||1}*100)+'%':'-'"></td>
+      <td class="s-r">${m!==''&&p.salePrice?Math.round(m/p.salePrice*100)+'%':'-'}</td></tr>`;
+  }).join('') || '<tr><td colspan="4" class="l muted">상품이 없습니다.</td></tr>';
+}
+async function saveMargins(){
+  try{
+    const items=[...document.querySelectorAll('#sRows tr[data-code]')].map(tr=>({productCode:tr.dataset.code, productName:tr.dataset.name, margin:tr.querySelector('.s-m').value}))
+      .filter(x=>x.margin!=='');
+    await api('saveMargins',{items}); await refresh(); note('마진을 저장했습니다.');
+  }catch(e){ note('마진 저장 오류: '+e.message, true); }
+}
+function saveSite(){
+  const v=$('sSite').value.trim();
+  try{ new URL(v); }catch(_){ return note('주소 형식이 올바르지 않습니다.', true); }
+  try{ localStorage.setItem('adSite', v); }catch(_){}
+  note('링크 기본 주소를 저장했습니다. 새로 만드는 소재부터 적용됩니다.');
+}
+
+/* ---------- 자동 로그인 (같은 탭 안에서만) ---------- */
+(async function(){ const saved=load('adPw'); if(saved){ $('pw').value=saved; login(); } })();
+</script>
+</body>
+</html>
