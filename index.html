@@ -213,9 +213,10 @@ code{background:#f1f3f1;padding:2px 5px;border-radius:5px;font-size:12px}
 <section id="tab-set" class="hidden">
   <div class="card">
     <h2>상품별 개당 마진</h2>
-    <p class="muted">판매가에서 매입가·택배비·포장비를 뺀 <b>1개당 남는 금액</b>입니다. 수익률 계산에 쓰입니다.</p>
+    <p class="muted">해남공구마켓 시트의 <b>상품세부정보(기본매입단가·기본택배비)</b>로 자동 계산합니다. 파트너 주문은 주문 당시 수당만큼 더 빼서 계산합니다.<br>
+    매입단가가 비어 있는 상품만 오른쪽 <b>직접 입력</b> 값을 씁니다. 매입단가가 바뀌면 상품세부정보 시트에서 고치세요.</p>
     <div class="table-wrap" style="margin-top:10px"><table>
-      <thead><tr><th class="l">상품</th><th>판매가</th><th>개당 마진(원)</th><th>마진율</th></tr></thead>
+      <thead><tr><th class="l">상품</th><th>판매가</th><th>매입단가</th><th>택배비</th><th>자동 마진</th><th>마진율</th><th>직접 입력(매입단가 없을 때)</th></tr></thead>
       <tbody id="sRows"></tbody>
     </table></div>
     <button class="btn primary" style="margin-top:12px" onclick="saveMargins()">마진 저장</button>
@@ -240,7 +241,7 @@ const won = n => Math.round(Number(n||0)).toLocaleString('ko-KR') + '원';
 const num = n => Math.round(Number(n||0)).toLocaleString('ko-KR');
 const pct = n => n == null ? '-' : Math.round(n*100) + '%';
 let PW = '';
-let DATA = { products: [], creatives: [], margins: {}, dbsense: [] };
+let DATA = { products: [], creatives: [], margins: {}, productCosts: {}, dbsense: [] };
 
 function store(k, v){ try{ v==null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); }catch(_){} }
 function load(k){ try{ return sessionStorage.getItem(k); }catch(_){ return null; } }
@@ -273,7 +274,7 @@ $('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
 
 async function refresh(){
   const d = await api('bootstrap', {});
-  DATA = { products: d.products||[], creatives: d.creatives||[], margins: d.margins||{}, dbsense: d.dbsense||[] };
+  DATA = { products: d.products||[], creatives: d.creatives||[], margins: d.margins||{}, productCosts: d.productCosts||{}, dbsense: d.dbsense||[] };
   fillProductSelect(); renderList(); renderMargins(); renderDb(); previewCodes();
 }
 
@@ -533,15 +534,20 @@ async function delDb(row){
 /* ---------- 설정 ---------- */
 function renderMargins(){
   $('sRows').innerHTML = DATA.products.map(p=>{
+    const c=DATA.productCosts[p.productCode]||{};
+    const auto = c.buy>0 ? Number(p.salePrice||0)-c.buy-Number(c.ship||0) : null;
     const m=DATA.margins[p.productCode]??'';
-    return `<tr data-code="${esc(p.productCode)}" data-name="${esc(p.productName)}"><td class="l">${esc(p.productName)}</td><td>${num(p.salePrice)}</td>
-      <td><input class="s-m" type="number" min="0" value="${m}" style="width:120px" oninput="this.closest('tr').querySelector('.s-r').textContent=this.value&&${Number(p.salePrice)||0}?Math.round(this.value/${Number(p.salePrice)||1}*100)+'%':'-'"></td>
-      <td class="s-r">${m!==''&&p.salePrice?Math.round(m/p.salePrice*100)+'%':'-'}</td></tr>`;
-  }).join('') || '<tr><td colspan="4" class="l muted">상품이 없습니다.</td></tr>';
+    const rate = auto!==null && p.salePrice ? Math.round(auto/p.salePrice*100)+'%' : '-';
+    return `<tr data-code="${esc(p.productCode)}" data-name="${esc(p.productName)}">
+      <td class="l">${esc(p.productName)}</td><td>${num(p.salePrice)}</td>
+      <td>${c.buy>0?num(c.buy):'<span style="color:#c0392b">미입력</span>'}</td><td>${c.buy>0?num(c.ship||0):'-'}</td>
+      <td><b style="${auto!==null&&auto<=0?'color:#c0392b':''}">${auto===null?'-':num(auto)}</b></td><td>${rate}</td>
+      <td>${auto===null?`<input class="s-m" type="number" min="0" value="${m}" style="width:110px">`:'<span class="muted">자동 사용</span>'}</td></tr>`;
+  }).join('') || '<tr><td colspan="7" class="l muted">상품이 없습니다.</td></tr>';
 }
 async function saveMargins(){
   try{
-    const items=[...document.querySelectorAll('#sRows tr[data-code]')].map(tr=>({productCode:tr.dataset.code, productName:tr.dataset.name, margin:tr.querySelector('.s-m').value}))
+    const items=[...document.querySelectorAll('#sRows tr[data-code]')].filter(tr=>tr.querySelector('.s-m')).map(tr=>({productCode:tr.dataset.code, productName:tr.dataset.name, margin:tr.querySelector('.s-m').value}))
       .filter(x=>x.margin!=='');
     await api('saveMargins',{items}); await refresh(); note('마진을 저장했습니다.');
   }catch(e){ note('마진 저장 오류: '+e.message, true); }
