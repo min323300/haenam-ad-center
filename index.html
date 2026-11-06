@@ -47,7 +47,33 @@ td.l,th.l{text-align:left}td.wrap{white-space:normal;min-width:180px}
 #login{max-width:380px;margin:12vh auto}
 code{background:#f1f3f1;padding:2px 5px;border-radius:5px;font-size:12px}
 .link{font-size:12px;color:#555;max-width:340px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:middle}
-@media(max-width:700px){.field{min-width:46%}}
+/* 모바일 카드 */
+.mcards{display:none}
+.mcard{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.mcard .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mcard .copy{font-size:13px;margin:6px 0 8px;line-height:1.45}
+.mcard .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mcard .grid div{background:#f7f9f7;border-radius:8px;padding:6px 8px}
+.mcard .grid span{display:block;font-size:11px;color:var(--muted)}
+.mcard .grid b{font-size:14px}
+.mcard .why{font-size:12px;color:var(--muted);margin-top:8px}
+@media(max-width:700px){
+  .field{min-width:46%}
+  .head-in{padding:10px 12px;gap:8px}
+  .logo{font-size:16px}.logo small{display:none}
+  nav{order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  nav button{flex:0 0 auto;padding:8px 11px;font-size:13px}
+  main{margin:12px auto;padding:0 10px 40px}
+  .card{padding:14px;border-radius:14px}
+  h2{font-size:18px}
+  .tiles{grid-template-columns:repeat(2,1fr);gap:8px}
+  .tile{padding:10px}.tile b{font-size:18px}
+  .row>.btn{width:100%}
+  input,select{font-size:16px}
+  #tab-dash .table-wrap{display:none}
+  .mcards{display:block}
+  td input{min-width:80px}
+}
 </style>
 </head>
 <body>
@@ -90,6 +116,7 @@ code{background:#f1f3f1;padding:2px 5px;border-radius:5px;font-size:12px}
       <button class="btn primary" onclick="loadDashboard()">불러오기</button>
     </div>
     <div class="tiles" id="dTiles"></div>
+    <div class="mcards" id="dCards"></div>
     <div class="table-wrap"><table>
       <thead><tr><th class="l">판정</th><th class="l">소재</th><th class="l">문구</th><th>광고비</th><th>클릭</th><th>클릭당</th><th>방문자</th><th>주문</th><th>입금</th><th>입금매출</th><th>마진</th><th>DB수익</th><th>순이익</th><th>수익률</th><th class="l">이유</th></tr></thead>
       <tbody id="dRows"><tr><td colspan="15" class="l muted">불러오기를 눌러 주세요.</td></tr></tbody>
@@ -311,6 +338,15 @@ async function loadDashboard(){
       <td style="${r.net<0?'color:#c0392b':''}">${num(r.net)}</td><td>${pct(r.roas)}</td>
       <td class="l wrap muted">${esc(r.reason)}</td></tr>`).join('')
       : '<tr><td colspan="15" class="l muted">해당 기간에 소재가 없습니다. "소재 만들기"에서 먼저 소재를 만들어 주세요.</td></tr>';
+    $('dCards').innerHTML = rows.length ? rows.map(r=>`<div class="mcard">
+      <div class="top"><div><b>${esc(r.code)}</b> <span class="muted">${esc(r.channel)} · ${esc(r.productName)}</span></div><span class="badge v-${esc(r.verdict)}">${esc(r.verdict)}</span></div>
+      <div class="copy">${esc(r.copy)}</div>
+      <div class="grid">
+        <div><span>광고비</span><b>${num(r.cost)}</b></div><div><span>클릭</span><b>${num(r.clicks)}</b></div><div><span>방문자</span><b>${num(r.visitors)}</b></div>
+        <div><span>주문(입금)</span><b>${num(r.orders)}(${num(r.paidOrders)})</b></div><div><span>순이익</span><b style="${r.net<0?'color:#c0392b':''}">${num(r.net)}</b></div><div><span>수익률</span><b>${pct(r.roas)}</b></div>
+      </div>
+      <div class="why">${esc(r.reason)}</div></div>`).join('')
+      : '<p class="muted">해당 기간에 소재가 없습니다.</p>';
     $('dNote').textContent = `소재코드가 없는 주문 ${d.untaggedOrders}건(직접 방문·파트너 링크 등)은 위 표에 포함되지 않습니다. 방문자 수는 해남공구마켓 방문통계 기준입니다.`;
   }catch(e){ note('대시보드 오류: '+e.message, true); }
 }
